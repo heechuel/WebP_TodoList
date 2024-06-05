@@ -16,19 +16,17 @@ const TodoList = () => {
   }, []);
 
   const deleteTask = (index) => {
-    let tempList = taskList;
+    let tempList = [...taskList];
     tempList.splice(index, 1);
     localStorage.setItem("taskList", JSON.stringify(tempList));
     setTaskList(tempList);
-    window.location.reload();
   };
 
   const updateListArray = (obj, index) => {
-    let tempList = taskList;
+    let tempList = [...taskList];
     tempList[index] = obj;
     localStorage.setItem("taskList", JSON.stringify(tempList));
     setTaskList(tempList);
-    window.location.reload();
   };
 
   const toggle = () => {
@@ -36,10 +34,10 @@ const TodoList = () => {
   };
 
   const saveTask = (taskObj) => {
-    let tempList = taskList;
+    let tempList = [...taskList];
     tempList.push(taskObj);
     localStorage.setItem("taskList", JSON.stringify(tempList));
-    setTaskList(taskList);
+    setTaskList(tempList);
     setModal(false);
   };
 
@@ -58,7 +56,7 @@ const TodoList = () => {
           ))}
         </Box>
       </Container>
-      <CreateTask toggle={toggle} modal={modal} save={saveTask} />
+      {modal && <CreateTask toggle={toggle} modal={modal} save={saveTask} />}
     </>
   );
 };

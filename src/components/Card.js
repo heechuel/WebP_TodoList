@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Card as MUICard, CardContent, Typography, IconButton } from '@mui/material';
+import { Box, Card as MUICard, CardContent, Typography, IconButton, Checkbox } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import EditTask from '../modals/EditTask';
 
@@ -13,12 +13,14 @@ const categoryColors = {
 
 const Card = ({ taskObj, index, deleteTask, updateListArray }) => {
   const [modal, setModal] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(taskObj.isCompleted || false);
 
   const toggle = () => {
     setModal(!modal);
   };
 
   const updateTask = (obj) => {
+    obj.isCompleted = isCompleted;
     updateListArray(obj, index);
   };
 
@@ -26,19 +28,29 @@ const Card = ({ taskObj, index, deleteTask, updateListArray }) => {
     deleteTask(index);
   };
 
+  const handleCheckboxChange = (event) => {
+    const completed = event.target.checked;
+    setIsCompleted(completed);
+    const updatedTask = { ...taskObj, isCompleted: completed };
+    updateTask(updatedTask);
+  };
+
   const category = taskObj.Category || "Others";
   const colors = categoryColors[category];
 
   return (
     <>
-      <MUICard sx={{ maxWidth: 400, height:"35vh", width:"20vh", m: 2, position: 'relative', backgroundColor: colors.secondaryColor }}>
+      <MUICard sx={{ maxWidth: 400, height: "35vh", width: "20vh", m: 2, position: 'relative', backgroundColor: colors.secondaryColor }}>
         <Box sx={{ height: 10, backgroundColor: colors.primaryColor }} />
         <CardContent>
-          <Typography variant="h5" component="div" sx={{ backgroundColor: colors.secondaryColor, borderRadius: 1, p: 3 }}>
+          <Typography variant="h5" component="div" sx={{ backgroundColor: colors.secondaryColor, borderRadius: 1, p: 3, textDecoration: isCompleted ? 'line-through' : 'none' }}>
             {taskObj.Name}
           </Typography>
-          <Typography variant="body2" sx={{ mt: 2 }}>
+          <Typography variant="body2" sx={{ mt: 2, textDecoration: isCompleted ? 'line-through' : 'none' }}>
             {taskObj.Description}
+          </Typography>
+          <Typography variant="caption" display="block" sx={{ mt: 15, color: colors.primaryColor }}>
+            {category}
           </Typography>
           <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
             <IconButton onClick={() => setModal(true)} sx={{ color: colors.primaryColor }}>
@@ -48,9 +60,19 @@ const Card = ({ taskObj, index, deleteTask, updateListArray }) => {
               <Delete />
             </IconButton>
           </Box>
+          <Checkbox
+            checked={isCompleted}
+            onChange={handleCheckboxChange}
+            sx={{ position: 'absolute', bottom: 16, right: 16, color: colors.primaryColor }}
+          />
+          {isCompleted && (
+            <Typography variant="body2" sx={{ position: 'absolute', bottom: 16, left: 16, color: 'green' }}>
+              완료됨
+            </Typography>
+          )}
         </CardContent>
       </MUICard>
-      <EditTask modal={modal} toggle={toggle} updateTask={updateTask} taskObj={taskObj} />
+      {modal && <EditTask modal={modal} toggle={toggle} updateTask={updateTask} taskObj={taskObj} />}
     </>
   );
 };
